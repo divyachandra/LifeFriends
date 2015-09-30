@@ -20,6 +20,8 @@ import org.apache.log4j.Logger;
 import com.csuf.util.User;
 //import com.mysql.jdbc.Blob;
 
+//Added comment to test - 9/30/2015
+
 @WebServlet(name = "UserLogin", urlPatterns = { "/UserLogin" })
 public class UserLogin extends HttpServlet {
 	private static final long serialVersionUID = 1L;

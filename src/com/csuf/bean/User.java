@@ -303,7 +303,14 @@ public class User extends BaseBean {
         }
 
         public Collection<User> searchAll() throws SQLException {
-            return super.search(TABLE, null, null, null, PK_COLUMN);
+            return search(TABLE, null, null, null, PK_COLUMN);
+        }
+
+        public Collection<User> searchAllActive() throws SQLException {
+            String filter = " Active = ? ";
+            Object[] parms = {true};
+
+            return search(TABLE, null, filter, parms, PK_COLUMN);
         }
 
         public User findByEmailAndPassword(String email, String password) throws SQLException {

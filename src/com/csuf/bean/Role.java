@@ -12,16 +12,18 @@ import java.util.Map;
  * Created by Divya on 26-09-2015.
  */
 public class Role extends BaseBean {
-    private int roleId;
+    public static int ADMIN = 1;
+    public static int USER = 2;
+
     private String name;
     private boolean active;
 
     public int getRoleId() {
-        return roleId;
+        return (Integer) getPk();
     }
 
     public void setRoleId(int roleId) {
-        this.roleId = roleId;
+        setPk(new Integer(roleId));
     }
 
     public String getName() {
@@ -46,7 +48,7 @@ public class Role extends BaseBean {
 
     public static class DAO extends BaseDAO<Role> {
         private static final String TABLE = "Role";
-        private static final String PK_COLUMN = "RoleId";
+        private static final String PK_COLUMN = "RoleID";
 
         protected DAO() {
             super(true);
@@ -65,23 +67,22 @@ public class Role extends BaseBean {
 
         @Override
         public int insert(Role bl) throws SQLException {
-            return insert(bl, TABLE, PK_COLUMN);
+            throw new SQLException("Unsupported operation");
         }
 
         @Override
         public int update(Role bl) throws SQLException {
-            return update(bl, TABLE, PK_COLUMN);
+            throw new SQLException("Unsupported operation");
         }
 
         @Override
         public int remove(Role bl) throws SQLException {
-            return remove(bl, TABLE, PK_COLUMN);
+            throw new SQLException("Unsupported operation");
         }
 
         @Override
         protected Map<String, Object> buildColumns(Role bl) {
             Map<String, Object> map = new HashMap<String, Object>();
-            putInt(map, "RoleId", bl.getRoleId());
             putString(map, "Name", bl.getName(), false);
             putBoolean(map, "Active", bl.isActive());
             return map;
@@ -90,7 +91,6 @@ public class Role extends BaseBean {
         @Override
         protected void loadColumns(Role bl, Map<String, Object> columns) {
             bl.setPk(getObject(columns, PK_COLUMN));
-            bl.setRoleId(getInt(columns, "RoleId"));
             bl.setName(getString(columns, "Name"));
             bl.setActive(getBool(columns, "Active"));
         }

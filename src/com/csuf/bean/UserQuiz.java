@@ -11,8 +11,7 @@ import java.util.Map;
 /**
  * Created by Divya on 26-09-2015.
  */
-public class Donor extends BaseBean {
-    private int donorId;
+public class UserQuiz extends BaseBean {
     private int userId;
     private boolean bloodTransfusion;
     private boolean smoking;
@@ -23,12 +22,12 @@ public class Donor extends BaseBean {
     private int height;
     private boolean active;
 
-    public int getDonorId() {
-        return donorId;
+    public int getUserQuizId() {
+        return (Integer) getPk();
     }
 
-    public void setDonorId(int donorId) {
-        this.donorId = donorId;
+    public void setUserQuizId(int userQuizId) {
+        setPk(new Integer(userQuizId));
     }
 
     public int getUserId() {
@@ -107,43 +106,42 @@ public class Donor extends BaseBean {
 
     public static DAO  getDao() { return dao; }
 
-    public static class DAO extends BaseDAO<Donor> {
-        private static final String TABLE = "Donor";
-        private static final String PK_COLUMN = "DonorId";
+    public static class DAO extends BaseDAO<UserQuiz> {
+        private static final String TABLE = "UserQuiz";
+        private static final String PK_COLUMN = "UserQuizID";
 
         protected DAO() {
             super(true);
         }
 
         @Override
-        public Donor createInstance() {
-            return new Donor();
+        public UserQuiz createInstance() {
+            return new UserQuiz();
         }
 
         @Override
-        public Donor findByPK(Object pk) throws SQLException {
+        public UserQuiz findByPK(Object pk) throws SQLException {
             return findByPK(pk, TABLE, PK_COLUMN );
         }
 
         @Override
-        public int insert(Donor bl) throws SQLException {
+        public int insert(UserQuiz bl) throws SQLException {
             return insert(bl, TABLE, PK_COLUMN);
         }
 
         @Override
-        public int update(Donor bl) throws SQLException {
+        public int update(UserQuiz bl) throws SQLException {
             return update(bl, TABLE, PK_COLUMN);
         }
 
         @Override
-        public int remove(Donor bl) throws SQLException {
+        public int remove(UserQuiz bl) throws SQLException {
             return remove(bl, TABLE, PK_COLUMN);
         }
 
         @Override
-        protected Map<String, Object> buildColumns(Donor bl) {
+        protected Map<String, Object> buildColumns(UserQuiz bl) {
             Map<String, Object> map = new HashMap<String, Object>();
-            putInt(map, "DonorId", bl.getDonorId());
             putInt(map, "UserId", bl.getUserId());
             putBoolean(map, "BloodTransfusion", bl.isBloodTransfusion());
             putBoolean(map, "Smoking", bl.isSmoking());
@@ -157,9 +155,8 @@ public class Donor extends BaseBean {
         }
 
         @Override
-        protected void loadColumns(Donor bl, Map<String, Object> columns) {
+        protected void loadColumns(UserQuiz bl, Map<String, Object> columns) {
             bl.setPk(getObject(columns, PK_COLUMN));
-            bl.setDonorId(getInt(columns, "DonorId"));
             bl.setUserId(getInt(columns, "UserId"));
             bl.setBloodTransfusion(getBool(columns, "BloodTransfusion"));
             bl.setSmoking(getBool(columns, "Smoking"));
@@ -171,7 +168,7 @@ public class Donor extends BaseBean {
             bl.setActive(getBool(columns, "Active"));
         }
 
-        public Collection<Donor> searchAll() throws SQLException {
+        public Collection<UserQuiz> searchAll() throws SQLException {
           return super.search(TABLE, null, null, null, PK_COLUMN);
         }
     }

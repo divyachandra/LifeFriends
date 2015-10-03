@@ -4,9 +4,10 @@ package com.csuf.base;
  * Created by Divya on 26-09-2015.
  */
 public enum DbConfig {
-    LOCAL("localhost", "root", "root", "lifefriends");
+    LOCAL("localhost", "root", "root", "lifefriends"),
+    AWS("lifefriends.cp3atshksdqn.us-west-2.rds.amazonaws.com", "admin", "L1fefr1ends", "lifefriends");
 
-    public static final DbConfig DEFAULT = LOCAL;
+    public static final DbConfig DEFAULT = AWS;
     public String host;
     public String username;
     public String password;

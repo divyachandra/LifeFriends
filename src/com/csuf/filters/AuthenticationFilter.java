@@ -19,13 +19,14 @@ import org.apache.log4j.Logger;
 public class AuthenticationFilter implements Filter {
  
     private Logger logger = Logger.getLogger(AuthenticationFilter.class);
-     
+
+    @Override
     public void init(FilterConfig fConfig) throws ServletException {
         logger.info("AuthenticationFilter initialized");
     }
-     
+
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
- 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
          
@@ -34,16 +35,17 @@ public class AuthenticationFilter implements Filter {
          
         HttpSession session = req.getSession(false);
          
-        if(session == null && !(uri.endsWith("html") || uri.endsWith("Login") || uri.endsWith("_BloodNetwork") || uri.endsWith("jsp"))){
+        if(session == null && !(uri.endsWith("html") || uri.endsWith("Login") || uri.endsWith("jsp"))){
             logger.error("Unauthorized access request");
-            res.sendRedirect("UserLogin.html");
+            res.sendRedirect("Login.jsp");
         }else{
             // pass the request along the filter chain
             chain.doFilter(request, response);
         }
     }
- 
+
+    @Override
     public void destroy() {
-        //close any resources here
+        // close any resources here
     }
 }

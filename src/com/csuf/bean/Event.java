@@ -13,7 +13,6 @@ import java.util.Map;
  * Created by Divya on 26-09-2015.
  */
 public class Event extends BaseBean {
-    private int eventId;
     private String type;
     private String title;
     private String description;
@@ -28,11 +27,11 @@ public class Event extends BaseBean {
     private boolean active;
 
     public int getEventId() {
-        return eventId;
+        return (Integer) getPk();
     }
 
     public void setEventId(int eventId) {
-        this.eventId = eventId;
+        setPk(new Integer(eventId));
     }
 
     public String getType() {
@@ -170,7 +169,6 @@ public class Event extends BaseBean {
         @Override
         protected Map<String, Object> buildColumns(Event bl) {
             Map<String, Object> map = new HashMap<String, Object>();
-            putInt(map, "EventId", bl.getEventId());
             putString(map, "Type", bl.getType(), false);
             putString(map, "Title", bl.getTitle(), false);
             putString(map, "Description", bl.getDescription(), false);
@@ -181,7 +179,6 @@ public class Event extends BaseBean {
             putString(map, "State", bl.getState(), false);
             putString(map, "Zip", bl.getZip(), false);
             putString(map, "Country", bl.getCountry(), false);
-            putDate(map, "CreatedDate", bl.getCreatedDate());
             putBoolean(map, "Active", bl.isActive());
             return map;
         }
@@ -189,7 +186,6 @@ public class Event extends BaseBean {
         @Override
         protected void loadColumns(Event bl, Map<String, Object> columns) {
             bl.setPk(getObject(columns, PK_COLUMN));
-            bl.setEventId(getInt(columns, "EventID"));
             bl.setType(getString(columns, "Type"));
             bl.setTitle(getString(columns, "Title"));
             bl.setType(getString(columns, "Description"));

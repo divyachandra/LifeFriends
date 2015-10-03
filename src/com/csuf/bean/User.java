@@ -2,7 +2,6 @@ package com.csuf.bean;
 
 import com.csuf.base.BaseBean;
 import com.csuf.base.BaseDAO;
-import com.sun.java.swing.plaf.windows.WindowsTreeUI;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -13,8 +12,8 @@ import java.util.Map;
 /**
  * Created by Divya on 26-09-2015.
  */
-public class User extends BaseBean{
-    private int userId;
+public class User extends BaseBean {
+    private static DAO dao = new DAO();
     private String email;
     private String password;
     private String firstName;
@@ -33,13 +32,20 @@ public class User extends BaseBean{
     private String gender;
     private int roleId;
     private boolean active;
+    private boolean donor;
+    private boolean lifeCertified;
+    private boolean officialCertified;
+
+    public static DAO getDao() {
+        return new DAO();
+    }
 
     public int getUserId() {
-        return userId;
+        return (Integer) getPk();
     }
 
     public void setUserId(int userId) {
-        this.userId = userId;
+        setPk(new Integer(userId));
     }
 
     public String getEmail() {
@@ -186,13 +192,33 @@ public class User extends BaseBean{
         this.active = active;
     }
 
-    private static DAO dao = new DAO();
+    public boolean isDonor() {
+        return donor;
+    }
 
-    public static DAO getDao() { return new DAO(); }
+    public void setDonor(boolean donor) {
+        this.donor = donor;
+    }
+
+    public boolean isLifeCertified() {
+        return lifeCertified;
+    }
+
+    public void setLifeCertified(boolean lifeCertified) {
+        this.lifeCertified = lifeCertified;
+    }
+
+    public boolean isOfficialCertified() {
+        return officialCertified;
+    }
+
+    public void setOfficialCertified(boolean officialCertified) {
+        this.officialCertified = officialCertified;
+    }
 
     public static class DAO extends BaseDAO<User> {
         private static final String TABLE = "User";
-        private static final String PK_COLUMN = "UserId";
+        private static final String PK_COLUMN = "UserID";
 
         protected DAO() {
             super(true);
@@ -206,7 +232,7 @@ public class User extends BaseBean{
 
         @Override
         public User findByPK(Object pk) throws SQLException {
-            return findByPK(pk,TABLE, PK_COLUMN);
+            return findByPK(pk, TABLE, PK_COLUMN);
         }
 
         @Override
@@ -227,13 +253,11 @@ public class User extends BaseBean{
         @Override
         protected Map<String, Object> buildColumns(User bl) {
             Map<String, Object> map = new HashMap<String, Object>();
-            putInt(map, "UserId", bl.getUserId());
             putString(map, "Email", bl.getEmail(), false);
             putString(map, "Password", bl.getPassword(), false);
             putString(map, "FirstName", bl.getFirstName(), false);
             putString(map, "MiddleName", bl.getMiddleName(), false);
             putString(map, "LastName", bl.getLastName(), false);
-            putDate(map, "CreatedDate", bl.getCreatedDate());
             putDate(map, "UpdatedDate", bl.getUpdatedDate());
             putDate(map, "DOB", bl.getDOB());
             putString(map, "Phone", bl.getPhone(), false);
@@ -246,13 +270,15 @@ public class User extends BaseBean{
             putString(map, "Gender", bl.getGender(), false);
             putInt(map, "RoleId", bl.getRoleId());
             putBoolean(map, "Active", bl.isActive());
+            putBoolean(map, "IsDonor", bl.isDonor());
+            putBoolean(map, "LifeCertified", bl.isLifeCertified());
+            putBoolean(map, "OfficialCertified", bl.isOfficialCertified());
             return map;
         }
 
         @Override
         protected void loadColumns(User bl, Map<String, Object> columns) {
             bl.setPk(getObject(columns, PK_COLUMN));
-            bl.setUserId(getInt(columns, "UserId"));
             bl.setEmail(getString(columns, "Email"));
             bl.setPassword(getString(columns, "Password"));
             bl.setFirstName(getString(columns, "FirstName"));
@@ -271,10 +297,20 @@ public class User extends BaseBean{
             bl.setGender(getString(columns, "Gender"));
             bl.setRoleId(getInt(columns, "RoleId"));
             bl.setActive(getBool(columns, "Active"));
+            bl.setDonor(getBool(columns, "IsDonor"));
+            bl.setLifeCertified(getBool(columns, "LifeCertified"));
+            bl.setOfficialCertified(getBool(columns, "OfficialCertified"));
         }
 
         public Collection<User> searchAll() throws SQLException {
             return super.search(TABLE, null, null, null, PK_COLUMN);
+        }
+
+        public User findByEmailAndPassword(String email, String password) throws SQLException {
+            String filter = " Email = ? AND Password = ? ";
+            Object[] parms = {email, password};
+
+            return findByFilter(TABLE, null, filter, parms);
         }
     }
 }

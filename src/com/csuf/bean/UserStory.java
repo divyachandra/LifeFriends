@@ -12,18 +12,17 @@ import java.util.Map;
  * Created by Divya on 26-09-2015.
  */
 public class UserStory extends BaseBean{
-    private int userStoryId;
     private String title;
     private String description;
     private int userId;
     private boolean active;
 
     public int getUserStoryId() {
-        return userStoryId;
+        return (Integer) getPk();
     }
 
     public void setUserStoryId(int userStoryId) {
-        this.userStoryId = userStoryId;
+        setPk(new Integer(userStoryId));
     }
 
     public String getTitle() {
@@ -60,11 +59,11 @@ public class UserStory extends BaseBean{
 
     private static DAO doa = new DAO();
 
-    public static DAO getDoa() { return new DAO(); }
+    public static DAO getDao() { return new DAO(); }
 
     public static class DAO extends BaseDAO<UserStory>  {
         private static final String TABLE = "UserStory";
-        private static final String PK_COLUMN = "UserStoryId";
+        private static final String PK_COLUMN = "UserStoryID";
 
         protected DAO() {
             super(true);
@@ -99,7 +98,6 @@ public class UserStory extends BaseBean{
         @Override
         protected Map<String, Object> buildColumns(UserStory bl) {
             Map<String, Object> map = new HashMap<String, Object>();
-            putInt(map, "UserStoryId", bl.getUserStoryId());
             putString(map, "Title", bl.getTitle(), false);
             putString(map, "Description", bl.getDescription(), false);
             putInt(map, "UserId", bl.getUserId());
@@ -110,7 +108,6 @@ public class UserStory extends BaseBean{
         @Override
         protected void loadColumns(UserStory bl, Map<String, Object> columns) {
             bl.setPk(getObject(columns, PK_COLUMN));
-            bl.setUserStoryId(getInt(columns, "UserStoryId"));
             bl.setTitle(getString(columns, "Title"));
             bl.setDescription(getString(columns, "Description"));
             bl.setUserId(getInt(columns, "UserId"));

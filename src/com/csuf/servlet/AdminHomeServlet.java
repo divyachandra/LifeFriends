@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-@WebServlet(name = "DonorHomeServlet", urlPatterns = { "/DonorHome" })
-public class DonorHomeServlet extends BaseServlet {
+@WebServlet(name = "AdminHomeServlet", urlPatterns = { "/AdminHome" })
+public class AdminHomeServlet extends BaseServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -18,7 +18,7 @@ public class DonorHomeServlet extends BaseServlet {
 			redirect(getLoginPageUrl(), response);
 			return;
 		}
-		forward("DonorHome.jsp", request, response);
+		forward("AdminHome.jsp", request, response);
 	}
 
 	@Override

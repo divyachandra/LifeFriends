@@ -1,105 +1,141 @@
 package com.csuf.servlet;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import com.csuf.base.BaseServlet;
+import com.csuf.bean.Role;
+import com.csuf.bean.User;
+import com.mysql.jdbc.StringUtils;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import org.apache.log4j.Logger;
 
+@WebServlet(name = "RegisterServlet", urlPatterns = {"/Register"})
+public class RegisterServlet extends BaseServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (isLogedIn(request)) {
+            redirect(getHomePageUrl(request), response);
+            return;
+        }
+        forward("Register.jsp", request, response);
+    }
 
-@WebServlet(name = "RegisterServlet", urlPatterns = { "/RegisterServlet" })
-public class RegisterServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        User newUser = new User();
+        newUser.setEmail(request.getParameter("email"));
+        newUser.setPassword(request.getParameter("password"));
+        newUser.setFirstName(request.getParameter("firstname"));
+        newUser.setMiddleName(request.getParameter("middlename"));
+        newUser.setLastName(request.getParameter("lastname"));
+        newUser.setDOB(getDOB(request.getParameter("dob")));
+        newUser.setPhone(request.getParameter("phone"));
+        newUser.setAddress(request.getParameter("address"));
+        newUser.setCity(request.getParameter("city"));
+        newUser.setState(request.getParameter("state"));
+        newUser.setZip(request.getParameter("zip"));
+        newUser.setCountry(request.getParameter("country"));
+        newUser.setBloodGroup(request.getParameter("bloodtype"));
+        newUser.setGender(request.getParameter("gender"));
+        newUser.setDonor(isDonor(request.getParameter("donor")));
 
-	static Logger logger = Logger.getLogger(RegisterServlet.class);
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String firstname = request.getParameter("firstname");
-		String lastname = request.getParameter("lastname");
-		String email = request.getParameter("email");
-		String email1 = request.getParameter("email1");
-		String password = request.getParameter("password");
-		String bloodtype=request.getParameter("bloodtype");
-	    String gender=request.getParameter("gender");
-		String dob=request.getParameter("dob");
-		String errorMsg = null;
-		if(firstname == null || firstname.equals("")){
-			errorMsg = "Fields can't be null or empty.";
-		}
-		if(lastname == null || lastname.equals("")){
-			errorMsg = "Fields can't be null or empty.";
-		}
-		if(email == null || email.equals("")){
-			errorMsg = "Fields can't be null or empty.";
-		}
-		if(email1 == null || email1.equals("")){
-			errorMsg = "Fields can't be null or empty.";
-		}
-		if(password == null || password.equals("")){
-			errorMsg = "password can't be null or empty.";
-		}
-		/**if(gender == null || gender.equals("")){
-			errorMsg = "Select your Gender";
-		}**/
-		if(bloodtype == null || bloodtype.equals("")){
-			errorMsg = "Blood type cannot be empty";
-		}
-		if(!email.equals(email1))
-		{
-			errorMsg="Email does not match";
-		}
-		
-		if(errorMsg != null){
-			RequestDispatcher rd = getServletContext().getRequestDispatcher("/register.html");
-			PrintWriter out= response.getWriter();
-			out.println("<font color=red>"+errorMsg+"</font>");
-			rd.include(request, response);
-		}else{
-		
-		Connection con = (Connection) getServletContext().getAttribute("DBConnection");
-		PreparedStatement ps = null;
-		try {
-			ps = con.prepareStatement("insert into users(firstname,lastname,password,email,dob,gender,bloodtype) values (?,?,?,?,?,?,?)");
-			ps.setString(1, firstname);
-			ps.setString(2, lastname);
-			ps.setString(3, password);
-			ps.setString(4, email);
-			ps.setString(5, dob);
-			ps.setString(6, gender);
-			ps.setString(7, bloodtype);
-			ps.execute();
-			
-			logger.info("User registered with email="+email);
-			
-			//forward to login page to login
-			//PrintWriter out= response.getWriter();
-			//out.println("<font color=green>Registration successful, please login below.</font>");
-			RequestDispatcher rd = getServletContext().getRequestDispatcher("/UserLogin.html");
-			request.setAttribute("Message", "Register Successful, Please Login below");
-			rd.include(request, response);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			logger.error("Database connection problem");
-			throw new ServletException("DB Connection problem.");
-		}finally{
-			try {
-				ps.close();
-			} catch (SQLException e) {
-				logger.error("SQLException in closing PreparedStatement");
-			}
-		}
-		}
-		
-	}
+        String email1 = request.getParameter("email1");
+        String errorMessage = validateRegisterParams(newUser, email1);
+
+        if (errorMessage != null) {
+            request.setAttribute("message", errorMessage);
+        } else {
+            try {
+                createUser(newUser);
+                request.setAttribute("message", "User " + newUser.getEmail() + " has been registered successfully.");
+            } catch (SQLException e) {
+                logger.error("Error creating user " + newUser.getEmail() + ". " + e.getMessage());
+                request.setAttribute("message", "There was and error creating user. Please try again later ");
+            }
+        }
+        forward("Register.jsp", request, response);
+    }
+
+    private Date getDOB(String dateString) {
+        DateFormat format = new SimpleDateFormat("MM/DD/YYYY");
+        Date date = null;
+        try {
+            date = format.parse(dateString);
+        } catch (ParseException e) {
+            logger.error("Error converting dateString " + dateString + " to Date");
+        }
+        return date;
+    }
+
+    private boolean isDonor(String donorString) {
+        return Boolean.parseBoolean(donorString);
+    }
+
+    private void createUser(User user) throws SQLException {
+        user.setRoleId(Role.USER);
+        user.setActive(true);
+        User.getDao().insert(user);
+    }
+
+    private String validateRegisterParams(User user, String email) {
+        String errorMessage = null;
+
+        if (StringUtils.isNullOrEmpty(user.getFirstName())) {
+            errorMessage = "First Name can't be null or empty.";
+        }
+        if (StringUtils.isNullOrEmpty(user.getLastName())) {
+            errorMessage = "Last Name can't be null or empty.";
+        }
+        if (StringUtils.isNullOrEmpty(user.getEmail())) {
+            errorMessage = "Email can't be null or empty.";
+        }
+        if (StringUtils.isNullOrEmpty(email)) {
+            errorMessage = "Email can't be null or empty.";
+        }
+        if (StringUtils.isNullOrEmpty(user.getPassword())) {
+            errorMessage = "Password can't be null or empty.";
+        }
+        if (StringUtils.isNullOrEmpty(user.getGender())) {
+            errorMessage = "Select your Gender";
+        }
+        if (StringUtils.isNullOrEmpty(user.getBloodGroup())) {
+            errorMessage = "Blood type cannot be empty";
+        }
+        if (StringUtils.isNullOrEmpty(user.getPhone())) {
+            errorMessage = "Phone number can't be null or empty.";
+        }
+        if (StringUtils.isNullOrEmpty(user.getAddress())) {
+            errorMessage = "Address can't be null or empty.";
+        }
+        if (StringUtils.isNullOrEmpty(user.getCity())) {
+            errorMessage = "City can't be null or empty.";
+        }
+        if (StringUtils.isNullOrEmpty(user.getState())) {
+            errorMessage = "State can't be null or empty.";
+        }
+        if (StringUtils.isNullOrEmpty(user.getZip())) {
+            errorMessage = "Zip can't be null or empty.";
+        }
+        if (StringUtils.isNullOrEmpty(user.getCountry())) {
+            errorMessage = "Country can't be null or empty.";
+        }
+        if (user.getDOB() == null) {
+            errorMessage = "Date of Birth(DOB) can't be null or empty.";
+        }
+
+        if (!email.equals(user.getEmail())) {
+            errorMessage = "Email and Confirmation Email does not match";
+        }
+        return errorMessage;
+    }
 }
 
 

@@ -6,7 +6,7 @@ import org.junit.rules.TestName;
 import java.util.logging.Logger;
 
 public abstract class BaseTestCase extends Assert {
-    protected static Logger _log;
+    protected static Logger log;
     @Rule
     public TestName name = new TestName();
 
@@ -22,13 +22,13 @@ public abstract class BaseTestCase extends Assert {
 
     @Before
     public void setUp() throws Exception {
-        _log = Logger.getLogger(BaseTestCase.class.getName());
-        _log.info("JUNIT: Starting test " + getName());
+        log = Logger.getLogger(BaseTestCase.class.getName());
+        log.info("JUNIT: Starting test " + getName());
     }
 
     @After
     public void tearDown() throws Exception {
-        _log.info("JUNIT: Ending test " + getName());
+        log.info("JUNIT: Ending test " + getName());
     }
 
     private String getName() {

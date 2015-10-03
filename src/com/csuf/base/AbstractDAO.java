@@ -1,14 +1,7 @@
 package com.csuf.base;
 
 import com.csuf.exceptions.DbException;
-import sun.misc.IOUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.sql.Blob;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -122,8 +115,8 @@ public class AbstractDAO {
     }
 
     protected static Date getDate(Map<String, Object> data, String key) {
-        Timestamp stmp = (Timestamp) getObject(data, key);
-        Date date = stmp == null ? null : new Date(stmp.getTime());
+        Object stmp = getObject(data, key);
+        Date date = stmp == null ? null : (Date) stmp;
         return date;
     }
 }

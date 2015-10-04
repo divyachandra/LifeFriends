@@ -4,7 +4,6 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
@@ -57,3 +56,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Classes folder
+war/WEB-INF/classes/
